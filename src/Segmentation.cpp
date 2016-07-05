@@ -1,5 +1,6 @@
 #include "Segmentation.hpp"
 #include <stack>
+using std::stack;
 
 const vector<Point> Segmentation::_DIRECTIONS_ = { Point(1, 0), Point(0, -1),
 Point(-1, 0), Point(0, 1),
@@ -12,6 +13,16 @@ Segmentation::Segmentation(int width, int height, unsigned k, short t)
 {
 	RANGE_.width = width;
 	RANGE_.height = height;
+	threshold_ = t;
+	topk_ = k;
+	//Generate random colors
+	this->randColor();
+}
+
+Segmentation::Segmentation(Size sz, unsigned k, short t)
+{
+	RANGE_.width = sz.width;
+	RANGE_.height = sz.height;
 	threshold_ = t;
 	topk_ = k;
 	//Generate random colors
@@ -84,14 +95,15 @@ void Segmentation::Segment(Mat& depth, Mat& color)
 		[](const vector<Point>& v1, const vector<Point>& v2){return v1.size() > v2.size(); });
 	Mat pre = Mat::zeros(depth.size(), CV_8UC3);
 	draw(mainRegions_, pre, colors_);
-	//imshow("before merging", pre);
+	imshow("before merging", pre);
 	regionMerge(depth, mainRegions_, blackRegions_, topk_, 1);
 
 	draw(mainRegions_, disp, colors_);
 	//drawRegions(mainRegions_, color, depth, disp);
+	
 	drawBoundBox(mainRegions_, distance_, color, depth);
 
-	//imshow("segmentation", disp);
+	imshow("segmentation", disp);
 }
 
 
@@ -334,7 +346,11 @@ void Segmentation::drawRegions(SegmentSet &segment, Mat &color, Mat &depth, Mat 
 		}
 
 		imshow("xxx", color);
-		//waitKey( - 1)
+		//waitKey( - 1);
+
+
+		if (i)  continue;
+
 
 		/*
 		vector<Point> corners;
@@ -359,7 +375,7 @@ void Segmentation::drawRegions(SegmentSet &segment, Mat &color, Mat &depth, Mat 
 
 }
 
-void Segmentation::drawBoundBox(SegmentSet &segment, vector<double> &distance, Mat &color, Mat &depth)
+void Segmentation::drawBoundBox(SegmentSet &segment, vector<double> &distance, Mat &color, Mat &depth, string categoryName)
 {
 	int count = 0;
 	Mat classification = color.clone();
@@ -369,42 +385,10 @@ void Segmentation::drawBoundBox(SegmentSet &segment, vector<double> &distance, M
 		cv::convexHull(seg, hull, false);
 		//RotatedRect rr = cv::minAreaRect(hull);
 		Rect boundbox = Segmentation::hullBoundBox(seg);
-		Point center = (boundbox.tl() + boundbox.br()) / 2;
-		rectangle(color, boundbox, Scalar(255, 255, 255), 2);
-		//rectangle(depth, boundbox, Scalar(30000), 2);
-		//cv::putText(color, to_string((int)distance[count]), center, 0, 0.5, Scalar(0, 0, 255), 2);
-		//cv::putText(depth, to_string((int)distance[count]), center, 0, 0.5, Scalar(30000), 2);
-
-		if (count == 0){
-
-			rectangle(classification, boundbox, Scalar(0, 0, 255), 2);
-			cv::putText(classification, "cuboid", center, 0, 0.5, Scalar(0, 0, 255), 2);
-
-		}
+		//rectangle(color, boundbox, Scalar(255, 255, 255), 2);
 		count++;
-		//imshow("a" + to_string(count), color(boundbox));
-
-		/*
-		std::vector<cv::Point>::const_iterator it;
-		for (it = hull.begin() + 1; it != hull.end(); it++)
-		line(color, *(it-1), *it, Scalar(120, 120, 120), 2);
-		line(color, hull[0], hull.back(), Scalar(120, 120, 120), 2);
-		*/
 	}
-	//imshow("regions", color);
-	//imshow("classification", classification);
-	//imshow("depth", 65535 / 1200 * depth);
+	imshow("regions", color);
+	imshow("classification", classification);
+	imshow("depth", 65535 / 1200 * depth);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

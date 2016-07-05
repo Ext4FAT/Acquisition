@@ -7,7 +7,6 @@
 // Locate windows position
 void placeWindows(int topk)
 {
-	int interval = 300;
 	cv::namedWindow("depth");
 	cv::namedWindow("color");
 	cv::namedWindow("before merging");
@@ -15,14 +14,14 @@ void placeWindows(int topk)
 	cv::namedWindow("classification");
 	cv::namedWindow("regions");
 	cv::moveWindow("depth", 0, 0);
-	cv::moveWindow("color", interval, 0);
-	cv::moveWindow("segmentation", 3 * interval, 0);
-	cv::moveWindow("before merging", 2 * interval, 0);
-	cv::moveWindow("classification", 0, 2 * interval);
-	cv::moveWindow("regions", interval, 2 * interval);
+	cv::moveWindow("color", 350, 0);
+	cv::moveWindow("segmentation", 1050, 0);
+	cv::moveWindow("before-merging", 700, 0);
+	cv::moveWindow("classification", 350, 300);
+	cv::moveWindow("regions", 0, 300);
 	for (int k = 0; k < topk; k++) {
 		cv::namedWindow(to_string(k));
-		cv::moveWindow(to_string(k), k * interval, interval);
+		cv::moveWindow(to_string(k), (k + 2) * 350, 300);
 	}
 }
 
@@ -41,12 +40,12 @@ Mat Dataset::PXCImage2Mat(PXCImage* pxc)
 	PXCImage::ImageInfo info = pxc->QueryInfo();
 	PXCImage::ImageData data;
 	Mat cvt;
-	if (info.format & PXCImage::PIXEL_FORMAT_YUY2) {	//颜色数据
+	if (info.format & PXCImage::PIXEL_FORMAT_YUY2) {	//color data
 		if (pxc->AcquireAccess(PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_RGB24, &data) < PXC_STATUS_NO_ERROR)
 			return  Mat(0, 0, 0);
 		cvt = Mat(info.height, info.width, CV_8UC3, (void*)data.planes[0],data.pitches[0]/sizeof(uchar));
 	}
-	else if (info.format & PXCImage::PIXEL_FORMAT_DEPTH) {//深度数据
+	else if (info.format & PXCImage::PIXEL_FORMAT_DEPTH) {//depth data
 		if (pxc->AcquireAccess(PXCImage::ACCESS_READ, PXCImage::PIXEL_FORMAT_DEPTH, &data) < PXC_STATUS_NO_ERROR)
 			return  Mat(0, 0, 0);
 		cvt = Mat(info.height, info.width, CV_16U, (void*)data.planes[0], data.pitches[0] / sizeof(uchar));	//Mat初始化是按照长宽来定的
@@ -120,8 +119,10 @@ int Dataset::dataAcquire()
 	unsigned topk = 5;
 	short threshold = 3;
 	Segmentation myseg(320, 240, topk, threshold);
+
+	placeWindows(0);
 	//Detect each video frame
-	for (framecnt = 1; -1 == waitKey(1); ++framecnt) {
+	for (framecnt = 1; (1); ++framecnt) {
 		if (pxcsm->AcquireFrame(true) < PXC_STATUS_NO_ERROR)	break;
 		//Query the realsense color and depth, and project depth to color
 		try{
@@ -130,28 +131,15 @@ int Dataset::dataAcquire()
 			pxccolor = sample->color;
 			pxcdepth = projection->CreateDepthImageMappedToColor(pxcdepth, pxccolor);
 			//Generate and Show 3D Point Cloud
-			pxcStatus sts = projection->QueryVertices(pxcdepth, &vertices[0]);
-			if (sts >= PXC_STATUS_NO_ERROR) {
-				PXCImage* drawVertices = dw.DepthToWorldByQueryVertices(vertices, pxcdepth, light);
-				if (drawVertices){
-					Mat display = PXCImage2Mat(drawVertices);
-					imshow("display", display);
-				}
-			}
-			//waitKey(-1);
-			
 
-			////project to world
-			//projection->QueryVertices(pxcdepth, &vertices[0]);
-			//
-			//ofstream ofs("123.txt");
-			//for (auto v : vertices) {
-			//	if (v.x || v.y || v.z)
-			//		ofs << "v " << v.x << " " << v.y << " " << v.z << endl;
+			//pxcStatus sts = projection->QueryVertices(pxcdepth, &vertices[0]);
+			//if (sts >= PXC_STATUS_NO_ERROR) {
+			//	PXCImage* drawVertices = dw.DepthToWorldByQueryVertices(vertices, pxcdepth, light);
+			//	if (drawVertices){
+			//		Mat display = PXCImage2Mat(drawVertices);
+			//		imshow("display", display);
+			//	}
 			//}
-			//cout << endl;
-
-
 
 			//pxcdepth = projection->CreateColorImageMappedToDepth(pxcdepth,pxccolor);
 			depth = PXCImage2Mat(pxcdepth);
@@ -165,39 +153,14 @@ int Dataset::dataAcquire()
 			imshow("depth", 65535 / 1200 * depth2);
 			imshow("color", color2);
 
-			//myseg.completeDepth(depth);
-			if (framecnt & 1) {
-				myseg.Segment(depth2, color2);
-				myseg.clear();
+			myseg.Segment(depth2, color2);
+			myseg.clear();
+			
+
+			if (' ' == waitKey(1)) {
+				
 			}
-
-
-			//Segment by Depth
-			//bfs(depth,vector<vector<Point>>)
-
-			////Construct the filename to save
-			//time_t slot = time(0);
-			//std::string cpath = getSavePath(rgbDir_, slot, framecnt);
-			//std::string dpath = getSavePath(depthDir_, slot, framecnt);
-
-			////Save image
-			//imwrite(cpath, color);
-			//imwrite(dpath, depth);
-
-			//double dmax, dmin;
-			//minMaxLoc(depth, &dmin, &dmax);
-			//MESSAGE_COUT("MIN-MAX", dmin << " , " << dmax);
-
-			//Show image
-
-			//resize(color, color, cv::Size(640, 480));
-			//resize(depth, depth, cv::Size(640, 480));
-
-			
-			//imshow("Depth", 256 * 255 / 1200 * depth);
-			//imshow("COLOR", color);
-			
-			
+		
 			//Release Realsense SDK memory and read next frame 
 			pxcdepth->Release();
 			pxcsm->ReleaseFrame();
