@@ -23,6 +23,7 @@ using cv::imread;
 using cv::imwrite;
 using cv::line;
 using cv::rectangle;
+using cv::convexHull;
 
 /************************************************************************/
 /* TYPEDEF                                                              */

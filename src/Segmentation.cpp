@@ -217,6 +217,13 @@ inline Rect Segmentation::hullBoundBox(PointSet& hull)
 	return Rect(pmin - extend, pmax + extend) & RANGE_;
 }
 
+inline void Segmentation::calculateConvexHulls()
+{
+	for (auto &seg : mainRegions_) {
+		convexHulls_.push_back(PointSet());
+		convexHull(seg, convexHulls_.back(), false);
+	}
+}
 
 inline bool Segmentation::isRegionInsideHull(PointSet& pSet, PointSet& hull, double minSim)
 {
@@ -382,7 +389,7 @@ void Segmentation::drawBoundBox(SegmentSet &segment, vector<double> &distance, M
 
 	for (auto seg : segment) {
 		vector<Point> hull;
-		cv::convexHull(seg, hull, false);
+		convexHull(seg, hull, false);
 		//RotatedRect rr = cv::minAreaRect(hull);
 		Rect boundbox = Segmentation::hullBoundBox(seg);
 		//rectangle(color, boundbox, Scalar(255, 255, 255), 2);
