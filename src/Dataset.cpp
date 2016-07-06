@@ -158,8 +158,13 @@ int Dataset::dataAcquire()
 			if (' ' == waitKey(1)) {
 				time_t now = time(0);
 				int count = 0;
-				for (auto &boundbox: myseg.boundBoxes_) 
-					imwrite(colorDir_ + getSaveFileName(now, 100 * framecnt + count++), color2(boundbox));
+				for (auto &boundbox : myseg.boundBoxes_) {
+					string filename = getSaveFileName(now, 100 * framecnt + ++count);
+					string cpath = colorDir_ + filename;
+					string dpath = depthDir_ + filename;
+					imwrite(cpath, color2(boundbox));
+					imwrite(dpath, depth2(boundbox));
+				}
 				MESSAGE_COUT("[" << framecnt << "]", "write OK");
 			}
 

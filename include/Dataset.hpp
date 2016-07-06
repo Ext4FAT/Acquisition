@@ -14,10 +14,6 @@ public:
 	inline string getSavePath(const string &dirPrefix, time_t slot, long framecnt);
 	inline string getSaveFileName(time_t slot, long framecnt);
 	inline string getSaveDirName(time_t slot);
-	//string getSavePath(const string &dirPrefix, time_t slot, long framecnt);
-	//string getSaveFileName(time_t slot, long framecnt);
-	//string getSaveDirName(time_t slot);
-
 
 	//demo with real-time capture video stream
 	int show();

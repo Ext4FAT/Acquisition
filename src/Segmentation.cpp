@@ -205,7 +205,7 @@ void Segmentation::regionMerge(Mat& depth, SegmentSet& segment, SegmentSet& blac
 inline Rect Segmentation::hullBoundBox(PointSet& hull)
 {
 	static Point extend(5, 5);
-	Point pmax(0, 0), pmin(1<<30, 1<<30);
+	Point pmax(0, 0), pmin(0x7fffffff, 0x7fffffff);
 	for (auto p : hull) {
 		if (p.x > pmax.x) pmax.x = p.x;
 		if (p.x < pmin.x) pmin.x = p.x;

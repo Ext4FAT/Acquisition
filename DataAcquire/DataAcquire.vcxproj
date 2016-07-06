@@ -72,15 +72,16 @@
     <ClCompile Include="..\src\Dataset.cpp" />
     <ClCompile Include="..\src\DrawWorld.cpp" />
     <ClCompile Include="..\src\FileOperation.cpp" />
+    <ClCompile Include="..\src\HOG-SVM.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Segmentation.cpp" />
-    <ClCompile Include="..\src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Common.hpp" />
     <ClInclude Include="..\include\Dataset.hpp" />
     <ClInclude Include="..\include\DrawWorld.hpp" />
     <ClInclude Include="..\include\FileOperation.hpp" />
+    <ClInclude Include="..\include\HOG-SVM.hpp" />
     <ClInclude Include="..\include\MyDraw.hpp" />
     <ClInclude Include="..\include\Opencv.hpp" />
     <ClInclude Include="..\include\Realsense.hpp" />
