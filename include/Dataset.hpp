@@ -32,7 +32,7 @@ public:
 private:
 	string dir_;
 	string depthDir_;
-	string rgbDir_;
+	string colorDir_;
 	string pcdDir_;
 
 	PXCSizeI32 camera_;

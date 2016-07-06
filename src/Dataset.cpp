@@ -11,13 +11,13 @@ void placeWindows(int topk)
 	cv::namedWindow("color");
 	cv::namedWindow("before merging");
 	cv::namedWindow("segmentation");
-	cv::namedWindow("classification");
+	//cv::namedWindow("classification");
 	cv::namedWindow("regions");
 	cv::moveWindow("depth", 0, 0);
 	cv::moveWindow("color", 350, 0);
 	cv::moveWindow("segmentation", 1050, 0);
 	cv::moveWindow("before-merging", 700, 0);
-	cv::moveWindow("classification", 350, 300);
+	//cv::moveWindow("classification", 350, 300);
 	cv::moveWindow("regions", 0, 300);
 	for (int k = 0; k < topk; k++) {
 		cv::namedWindow(to_string(k));
@@ -27,7 +27,7 @@ void placeWindows(int topk)
 
 //Dir example: "..\\saveData\\"
 Dataset::Dataset(const string& Dir, int width, int height, float fps /*= 60*/) :
-dir_(Dir), depthDir_(Dir + "\\depth\\"), rgbDir_(Dir + "\\rgb\\"), pcdDir_(Dir + "\\pcd\\"), fps_(fps)
+dir_(Dir), depthDir_(Dir + "depth\\"), colorDir_(Dir + "color\\"), pcdDir_(Dir + "pcd\\"), fps_(fps)
 {
 	camera_.width = width;
 	camera_.height = height;
@@ -154,14 +154,18 @@ int Dataset::dataAcquire()
 			imshow("color", color2);
 
 			myseg.Segment(depth2, color2);
-			myseg.clear();
-			
-
+			//save regions
 			if (' ' == waitKey(1)) {
-				
+				time_t now = time(0);
+				int count = 0;
+				for (auto &boundbox: myseg.boundBoxes_) 
+					imwrite(colorDir_ + getSaveFileName(now, 100 * framecnt + count++), color2(boundbox));
+				MESSAGE_COUT("[" << framecnt << "]", "write OK");
 			}
-		
-			//Release Realsense SDK memory and read next frame 
+
+			// Clear Segmentation data; 
+			myseg.clear();
+			// Release Realsense SDK memory and read next frame 
 			pxcdepth->Release();
 			pxcsm->ReleaseFrame();
 		}
@@ -327,7 +331,7 @@ int Dataset::show()
 		if (waitKey(1) == ' ') {
 			//string filename = getSaveFileName(now, framecnt);
 			//string pcdFilepath = pcdDir_ + filename + ".pcd";
-			//string rgbFilepath = rgbDir_ + filename;
+			//string rgbFilepath = colorDir_ + filename;
 			//string depthFilepath = depthDir_ + filename;
 			//{//record regions;
 			//	string recordPath = dir_ + filename + ".txt";
