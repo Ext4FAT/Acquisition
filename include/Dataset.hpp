@@ -34,6 +34,7 @@ private:
 	PXCSizeI32 camera_;
 	pxcF32 fps_;
 	vector<PXCPoint3DF32> vertices_;
+	//HOG_SVM classification_;
 };
 
 

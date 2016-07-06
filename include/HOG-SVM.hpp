@@ -10,7 +10,7 @@ using cv::ml::ROW_SAMPLE;
 using cv::ml::SVM;
 
 
-class GroundTruth{
+class GroundTruth {
 public:
     int label;
     string imgname;
@@ -19,6 +19,14 @@ public:
         imgname = path;
     };
 };
+
+class Category {
+public:
+	map<int, string> index2name;
+	map<string, int> name2index;
+	string background = "Background";
+};
+
 
 /*******************************************************************************
 *   Utilize HOG as feature, and SVM as machine learning model.				   *
@@ -34,51 +42,57 @@ public:
      */
     HOG_SVM(string model_path);
     /**
-     * @brief LoadModel: load xml file as model
+     * @brief loadModel: load xml file as model
      * @param model_path    xml loacation
      * @return success/ fail
      */
-    bool LoadModel(string model_path);
+    bool loadModel(string model_path);
     /**
-     * @brief ExtractFeature: extract HOG feature
+     * @brief extractFeature: extract HOG feature
      * @param Img   input source
      * @param mrs   scaled size
      * @return      feature vector
      */
-    Mat ExtractFeature(Mat Img, Size mrs);
+    Mat extractFeature(Mat Img, Size mrs);
+	/**
+	* @brief getCategory: get category from sub dir names
+	* @param subdirs	categorynames
+	* @return			category number
+	*/
+	int getCategory(vector<string> &subdirs);
     /**
-     * @brief GetDataSet: get dataset
+     * @brief getDataSet: get dataset
      * @param data_path     image location
      * @return      feature matrix
      */
-    Mat GetDataSet(vector<string> data_path);
-    Mat GetDataSet(vector<string> data_path, vector<GroundTruth>& gt, int c);
+    int getDataSet(vector<string> &data_path, double gt);
+    Mat getDataSet(vector<string> &data_path, vector<GroundTruth>& gt, int c);
     /**
-     * @brief SetSvmParameter: set training Parameter
+     * @brief setSvmParameter: set training Parameter
      * @param sv_num    max support vectors number
      * @param c_r_type  classification/ regression
      * @param kernel    linear / gussian / ploy ...
      * @param gamma     if gussian need to set
      * @return          1
      */
-    int SetSvmParameter(int sv_num, int c_r_type, int kernel, double gamma);
+    int setSvmParameter(int sv_num, int c_r_type, int kernel, double gamma);
     /**
-     * @brief Training: training with svm
+     * @brief training: training with svm
      * @param trainSet  train data mat
      * @param label     label mat
      * @param save      save model or not
      * @param dir       save path
      * @return          1
      */
-    int Training(Mat& trainSet, Mat& label, bool save, string dir);
+    int training(Mat& trainSet, Mat& label, bool save, string dir);
     /**
-     * @brief Testing: if need to test, you can use this function
+     * @brief testing: if need to test, you can use this function
      * @param testSet   test matirx
      * @param gt        groundtruth, the othe impletementation is to show which are predicted error
      * @return          1
      */
-    int Testing(Mat& testSet, float gt);
-    int Testing(Mat& testSet, vector<GroundTruth> gt);
+    int testing(Mat& testSet, float gt);
+    int testing(Mat& testSet, vector<GroundTruth> gt);
     /**
      * @brief EndToEnd: the whole process, training and testing
      * @param data_path datapath
@@ -86,13 +100,15 @@ public:
      */
     float EndToEnd(string data_path);
     /**
-     * @brief Predict: predict label in practical application
+     * @brief predict: predict label in practical application
      * @param image    image / region need to classify
      * @return label
      */
-    float Predict(Mat& image);
+    float predict(Mat& image);
 
 private:
-	Ptr<SVM> svm;
-
+	Ptr<SVM> svm_;
+	Category catergory_;
+	Mat trainMat_;
+	Mat labels_;
 };

@@ -3,6 +3,7 @@
 #include "Macro.hpp"
 #include "Opencv.hpp"
 #include "Realsense.hpp"
+#include "HOG-SVM.hpp"
 
 // Locate windows position
 void placeWindows(int topk)
@@ -119,7 +120,9 @@ int Dataset::dataAcquire()
 	unsigned topk = 5;
 	short threshold = 3;
 	Segmentation myseg(320, 240, topk, threshold);
-
+	//Configure Classification
+	HOG_SVM classification(".\\IDLER-DESKTOP-ITEMS\\HOG-SVM-MODEL.xml");
+	//
 	placeWindows(0);
 	//Detect each video frame
 	for (framecnt = 1; (1); ++framecnt) {
@@ -167,6 +170,21 @@ int Dataset::dataAcquire()
 				}
 				MESSAGE_COUT("[" << framecnt << "]", "write OK");
 			}
+
+
+			//show hog_svm
+			{
+				Mat classify = color2.clone();
+				for (auto &boundbox : myseg.boundBoxes_) {
+					Mat reg = color2(boundbox);
+					if (classification.predict(reg) == 1) {
+						rectangle(classify, boundbox, Scalar(0, 0, 255), 2);
+					}
+				}
+				imshow("classification", classify);
+			}
+
+
 
 			// Clear Segmentation data; 
 			myseg.clear();
