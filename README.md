@@ -59,7 +59,7 @@ class HOG_SVM has member function `EndToEnd`, which need you to provide `datapat
 ```
 `predict` function can output the image label, which -1 represents Background
 ### Example
-```
+```c++
 	HOG_SVM hog_svm;
 	hog_svm.loadModel(model_path);
 	...
