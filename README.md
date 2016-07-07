@@ -4,8 +4,8 @@
 The next three numbers represent resolution and FPS.
 ### Example
 ```c++
-	Dataset data(save_dir_path, 640, 480, 30);
-	data.dataAcquire();
+Dataset data(save_dir_path, 640, 480, 30);
+data.dataAcquire();
 ```
 ## Train SVM model
 class HOG_SVM has member function `EndToEnd`, which need you to provide `datapath`.
@@ -19,8 +19,8 @@ class HOG_SVM has member function `EndToEnd`, which need you to provide `datapat
 ```
 ### Example				
 ```c++
-	HOG_SVM hog_svm;
-	hog_svm.EndToEnd(".\\IDLER-DESKTOP-ITEMS\\");
+HOG_SVM hog_svm;
+hog_svm.EndToEnd(".\\IDLER-DESKTOP-ITEMS\\");
 ```
 ## Predict with SVM model
 `model_path`: a xml file which stored svm info, like this:
@@ -60,9 +60,9 @@ class HOG_SVM has member function `EndToEnd`, which need you to provide `datapat
 `predict` function can output the image label, which -1 represents Background
 ### Example
 ```c++
-	HOG_SVM hog_svm;
-	hog_svm.loadModel(model_path);
-	...
-	hog_svm.predict(img);
-	...
+HOG_SVM hog_svm;
+hog_svm.loadModel(model_path);
+...
+hog_svm.predict(img);
+...
 ```
