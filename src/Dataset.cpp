@@ -5,6 +5,13 @@
 #include "Realsense.hpp"
 #include "HOG-SVM.hpp"
 
+
+//Show boundbox and word
+inline void drawText(Mat &img, Rect &boundbox, const string content)
+{
+	putText(img, content, (boundbox.tl() + boundbox.br()) / 2, 3, 0.6, Scalar(0, 0, 255), 2);
+}
+
 // Locate windows position
 void placeWindows(int topk)
 {
@@ -12,13 +19,13 @@ void placeWindows(int topk)
 	cv::namedWindow("color");
 	cv::namedWindow("before merging");
 	cv::namedWindow("segmentation");
-	//cv::namedWindow("classification");
+	cv::namedWindow("classification");
 	cv::namedWindow("regions");
 	cv::moveWindow("depth", 0, 0);
 	cv::moveWindow("color", 350, 0);
 	cv::moveWindow("segmentation", 1050, 0);
 	cv::moveWindow("before-merging", 700, 0);
-	//cv::moveWindow("classification", 350, 300);
+	cv::moveWindow("classification", 350, 300);
 	cv::moveWindow("regions", 0, 300);
 	for (int k = 0; k < topk; k++) {
 		cv::namedWindow(to_string(k));
@@ -175,10 +182,18 @@ int Dataset::dataAcquire()
 			//show hog_svm
 			{
 				Mat classify = color2.clone();
+				time_t now = time(0);
+				int count = 0;
 				for (auto &boundbox : myseg.boundBoxes_) {
 					Mat reg = color2(boundbox);
 					if (classification.predict(reg) == 1) {
 						rectangle(classify, boundbox, Scalar(0, 0, 255), 2);
+						drawText(classify, boundbox, "bottle");
+						//string filename = getSaveFileName(now, 100 * framecnt + ++count);
+						//string cpath = colorDir_ + filename;
+						//string dpath = depthDir_ + filename;
+						//imwrite(cpath, color2(boundbox));
+						//imwrite(dpath, depth2(boundbox));
 					}
 				}
 				imshow("classification", classify);

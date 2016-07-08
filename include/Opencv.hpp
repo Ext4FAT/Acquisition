@@ -22,6 +22,7 @@ using cv::imshow;
 using cv::imread;
 using cv::imwrite;
 using cv::line;
+using cv::putText;
 using cv::rectangle;
 using cv::convexHull;
 

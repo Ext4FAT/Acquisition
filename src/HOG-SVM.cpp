@@ -7,12 +7,25 @@ HOG_SVM::HOG_SVM()
     svm_ = SVM::create();
 }
 
-HOG_SVM::HOG_SVM(std::string model_path)
+HOG_SVM::HOG_SVM(const string model_path)
 {
     svm_ = Algorithm::load<SVM>(model_path);
 }
 
-bool HOG_SVM::loadModel(std::string model_path)
+inline void HOG_SVM::releaseTrainSet()
+{
+	trainMat_.release();
+	labels_.release();
+}
+
+inline void HOG_SVM::clearALL()
+{
+	svm_.release();
+	catergory_.clear();
+	releaseTrainSet();
+}
+
+bool HOG_SVM::loadModel(const string model_path)
 {
     bool flag = true;
     try{
@@ -60,12 +73,13 @@ int HOG_SVM::getDataSet(vector<string> &data_path, double gt)
 {
     int nImgNum = data_path.size();
     int success = 0;
+	MESSAGE_COUT("GET DATA ", gt);
     for (auto &path: data_path){
         Mat src = imread(path);
         if (src.cols && src.rows){
-			MESSAGE_COUT("PROCESS", findFileName(path) << "\t" << success++);
             Mat post = extractFeature(src, Size(64, 64));
             trainMat_.push_back(post);
+			MESSAGE_COUT("PROCESS " << ++success, findFileName(path));
         }
     }
 	Mat tmp = Mat::ones(success, 1, CV_32SC1) * gt;
@@ -151,6 +165,17 @@ float HOG_SVM::predict(Mat& image)
     gray.release();
     return svm_->predict(post);
 }
+
+int HOG_SVM::BinaryClassification(string pos_path, string neg_path)
+{
+	vector<string> pospaths = getCurdirFilePath(pos_path + "\\");
+	vector<string> negpaths = getCurdirFilePath(neg_path + "\\");
+	getDataSet(pospaths, 1);
+	getDataSet(negpaths, -1);
+	//training model
+	return training(trainMat_, labels_, true, ".\\IDLER-DESKTOP-ITEMS\\");
+}
+
 
 float HOG_SVM::EndToEnd(string data_path)
 {
