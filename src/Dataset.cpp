@@ -107,7 +107,7 @@ int Dataset::savePCD(const string& outfilename, Segmentation &myseg)
 //Acquire color/depth/pcd data
 int Dataset::dataAcquire()
 {
-	//Define variable
+	// Define variable
 	Mat color, depth, display;
 	vector<PXCPoint3DF32> vertices(camera_.height*camera_.width);
 	PXCSession *pxcsession;
@@ -117,7 +117,7 @@ int Dataset::dataAcquire()
 	PXCCapture::Sample *sample;
 	PXCImage *pxcdepth,*pxccolor;
 	long framecnt;
-	//Configure RealSense
+	// Configure RealSense
 	pxcsession = PXCSession::CreateInstance();
 	pxcsm = pxcsession->CreateSenseManager();
 	pxcsm->EnableStream(PXCCapture::STREAM_TYPE_COLOR, camera_.width, camera_.height, fps_);
@@ -132,29 +132,29 @@ int Dataset::dataAcquire()
 	projection = pxcdev->CreateProjection();
 	if (!projection) {
 		MESSAGE_COUT("ERROR", "Failed to create an SDK Projection");
-		return -1;
+		return -2;
 	}
-	//Configure Point Cloud Show
+	// Configure Point Cloud Show
 	DrawWorld dw(pxcsession, camera_);
 	PXCPoint3DF32 light = { .5, .5, 1.0 };
-	//Configure Segmentation
+	// Configure Segmentation
 	unsigned topk = 5;
 	short threshold = 3;
 	Segmentation myseg(320, 240, topk, threshold);
-	//Configure Classification
+	// Configure Classification
 	HOG_SVM classification(".\\IDLER-DESKTOP-ITEMS\\HOG-SVM-MODEL.xml");
 	//
 	placeWindows(0);
-	//Detect each video frame
+	// Detect each video frame
 	for (framecnt = 1; (1); ++framecnt) {
 		if (pxcsm->AcquireFrame(true) < PXC_STATUS_NO_ERROR)	break;
-		//Query the realsense color and depth, and project depth to color
+		// Query the realsense color and depth, and project depth to color
 		try{
 			sample = pxcsm->QuerySample();
 			pxcdepth = sample->depth;
 			pxccolor = sample->color;
 			pxcdepth = projection->CreateDepthImageMappedToColor(pxcdepth, pxccolor);
-			//Generate and Show 3D Point Cloud
+			// Generate and Show 3D Point Cloud
 
 			//pxcStatus sts = projection->QueryVertices(pxcdepth, &vertices[0]);
 			//if (sts >= PXC_STATUS_NO_ERROR) {
@@ -179,11 +179,9 @@ int Dataset::dataAcquire()
 			//imshow("depth", 65535 / 1200 * depth2);
 			//imshow("color", color2);
 
-
-
-
 			myseg.Segment(depth2, color2);
-			//save regions
+			
+			// save regions
 			if (' ' == waitKey(1)) {
 				time_t now = time(0);
 				int count = 0;
@@ -198,7 +196,7 @@ int Dataset::dataAcquire()
 			}
 
 
-			//show hog_svm
+			// show hog_svm
 			{
 				Mat classify = color2.clone();
 				time_t now = time(0);
@@ -218,9 +216,6 @@ int Dataset::dataAcquire()
 				threadShow("classification", classify);
 				//imshow("classification", classify);
 			}
-
-
-
 			// Clear Segmentation data; 
 			myseg.clear();
 			// Release Realsense SDK memory and read next frame 
