@@ -4,6 +4,20 @@
 #include "Opencv.hpp"
 #include "Realsense.hpp"
 #include "HOG-SVM.hpp"
+//thread
+#include <thread>
+using std::thread;
+
+void myimshow(const string winname, Mat &img)
+{
+	imshow(winname, img);
+}
+
+void threadShow(const string winname, Mat &img)
+{
+	thread t(myimshow, winname, img);
+	t.detach();
+}
 
 
 //Show boundbox and word
@@ -160,8 +174,13 @@ int Dataset::dataAcquire()
 			resize(depth, depth2, Size(320, 240));
 			resize(color, color2, Size(320, 240));
 
-			imshow("depth", 65535 / 1200 * depth2);
-			imshow("color", color2);
+			threadShow("color", color2);
+
+			//imshow("depth", 65535 / 1200 * depth2);
+			//imshow("color", color2);
+
+
+
 
 			myseg.Segment(depth2, color2);
 			//save regions
@@ -196,7 +215,8 @@ int Dataset::dataAcquire()
 						//imwrite(dpath, depth2(boundbox));
 					}
 				}
-				imshow("classification", classify);
+				threadShow("classification", classify);
+				//imshow("classification", classify);
 			}
 
 
@@ -206,6 +226,7 @@ int Dataset::dataAcquire()
 			// Release Realsense SDK memory and read next frame 
 			pxcdepth->Release();
 			pxcsm->ReleaseFrame();
+
 		}
 		catch (cv::Exception e){
 			MESSAGE_COUT("ERROR", e.what());
@@ -338,7 +359,8 @@ int Dataset::show()
 			for (auto p : myseg.mainRegions_[k]) {
 				show.at<Vec3b>(p) = display.at<Vec3b>(p);
 			}
-			imshow(to_string(k), show);
+			myimshow(to_string(k), show);
+			//imshow(to_string(k), show);
 		}
 
 
