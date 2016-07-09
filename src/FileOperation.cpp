@@ -1,5 +1,4 @@
 #include "FileOperation.hpp"
-#include "FileOperation.hpp"
 
 #include <windows.h>
 #include <vector>
@@ -55,8 +54,6 @@ std::vector<std::string> FileOperation::getSubdirName(std::string dirPath)
 	FindClose(hFind);
 	return files;
 }
-
-
 
 //Get file name from file path;
 std::string FileOperation::findFileName(std::string path)
