@@ -142,7 +142,9 @@ int Dataset::dataAcquire()
 	short threshold = 3;
 	Segmentation myseg(320, 240, topk, threshold);
 	// Configure Classification
-	HOG_SVM classification(".\\IDLER-DESKTOP-ITEMS\\HOG-SVM-MODEL.xml");
+	HOG_SVM classification(".\\gwj-dataset\\HOG-SVM-MODEL.xml");
+	vector<string> names = classification.getSubdirName(".\\gwj-dataset");
+	classification.getCategory(names);
 	//
 	placeWindows(0);
 	// Detect each video frame
@@ -203,9 +205,12 @@ int Dataset::dataAcquire()
 				int count = 0;
 				for (auto &boundbox : myseg.boundBoxes_) {
 					Mat reg = color2(boundbox);
-					if (classification.predict(reg) == 1) {
+					int predict = classification.predict(reg);
+					if (predict > 0) {
+						cout << predict << endl;
+						Category c = classification.category();
 						rectangle(classify, boundbox, Scalar(0, 0, 255), 2);
-						drawText(classify, boundbox, "bottle");
+						drawText(classify, boundbox, c.getName(predict));
 						//string filename = getSaveFileName(now, 100 * framecnt + ++count);
 						//string cpath = colorDir_ + filename;
 						//string dpath = depthDir_ + filename;
