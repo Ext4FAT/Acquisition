@@ -3,9 +3,9 @@
 
 int main(int argc, char** argv)
 {
-	HOG_SVM hog_svm;
-	hog_svm.BinaryClassification(".\\IDLER-DESKTOP-ITEMS\\bottle", ".\\IDLER-DESKTOP-ITEMS\\Background");
-	//hog_svm.EndToEnd(".\\IDLER-DESKTOP-ITEMS\\");
+	//HOG_SVM hog_svm;
+	//hog_svm.BinaryClassification(".\\IDLER-DESKTOP-ITEMS\\bottle", ".\\IDLER-DESKTOP-ITEMS\\Background");
+	////hog_svm.EndToEnd(".\\IDLER-DESKTOP-ITEMS\\");
 	
 	
 	string save_dir_path = ".\\savedData\\";

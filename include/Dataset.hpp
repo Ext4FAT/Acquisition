@@ -6,7 +6,6 @@
 class Dataset: public FileOperation
 {
 public:
-
 	Dataset(const string& Dir, int width, int height, float fps = 60);
 	int dataAcquire();
 	Mat PXCImage2Mat(PXCImage* pxc);

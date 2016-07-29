@@ -61,11 +61,14 @@ Mat HOG_SVM::extractFeature(Mat Img, Size mrs)
 int HOG_SVM::getCategory(vector<string> &subdirs)
 {
 	int index = 1;
+	std::sort(subdirs.begin(), subdirs.end());
 	for (auto &sd: subdirs) {
 		catergory_.name2index[sd] = index;
 		catergory_.index2name[index] = sd;
 		index++;
 	}
+	catergory_.name2index["Background"] = -1;
+	catergory_.index2name[-1] = "Background";
 	return index;
 }
 

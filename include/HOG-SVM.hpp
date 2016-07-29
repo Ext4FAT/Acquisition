@@ -28,11 +28,18 @@ public:
 class Category {
 public:
 	Category(){}
+	string getName(int index) {
+		return index2name[index];
+	}
+	const int getIndex(string categoryName) {
+		return name2index[categoryName];
+	}
 	void clear() {
 		index2name.clear();
 		name2index.clear();
 		background = "";
 	}
+
 public:
 	map<int, string> index2name;
 	map<string, int> name2index;
