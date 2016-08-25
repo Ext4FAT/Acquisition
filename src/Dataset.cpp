@@ -417,7 +417,57 @@ int Dataset::show()
 	return 1;
 }
 
-
+int Dataset::testSVM(string dir) 
+{
+	Size showSize = { camera_.width / 2, camera_.height / 2 };
+	//Configure Segmentation
+	unsigned topk = 5;
+	short threshold = 3;
+	Segmentation myseg(showSize.width, showSize.height, topk, threshold);
+	//Configure HOG-SVM
+	HOG_SVM hog_svm(".\\classification\\HOG-SVM-MODEL.xml");
+	//
+	vector<string> categories = {"bottle", "can", "teacup", "teapot", "box"};
+	//
+	for (auto categoryname : categories) {
+		vector<string> filenames = getCurdirFileName(dir + "\\" + categoryname);
+		for (auto filename : filenames) {
+			string color_path = dir + "\\" + categoryname + "\\" + filename;
+			string depth_path = dir + "\\depth\\" + filename;
+			//Segment by depth data
+			Mat depth, color, depth2, color2;
+			color = imread(color_path, CV_LOAD_IMAGE_UNCHANGED);
+			depth = imread(depth_path, CV_LOAD_IMAGE_UNCHANGED);
+			resize(depth, depth2, showSize);
+			resize(color, color2, showSize);
+			clock_t start = clock();
+			myseg.Segment(depth2, color2);
+			cout << "[Segmentation]\t" << 1.0*(clock() - start) / CLOCKS_PER_SEC << endl;
+			int count = 0;
+			for (auto &boundbox : myseg.boundBoxes_) {
+				start = clock();
+				Mat region = color2(boundbox);
+				int predict = hog_svm.predict(region);
+				++count;
+				if (predict == 2 || predict==3) {
+					string name = to_string(predict);
+					//rectangle(color2, boundbox, Scalar(0, 0, 255), 2);
+					//drawText(color2, boundbox, name);
+					cout << "[" << filename << "-" << count << "]\t" << 1.0*(clock() - start) / CLOCKS_PER_SEC << endl;
+					imwrite(".//2//+" + filename + "-" + to_string(count) + ".png", region);
+				}
+				else {
+					imwrite(".//-1//+" + filename + "-" + to_string(count) + ".png", region);
+				}
+			}
+			start = clock();
+			
+			cout << "[imwrite]\t" << 1.0*(clock() - start) / CLOCKS_PER_SEC << endl;
+			myseg.clear();
+		}
+	}
+	return 1;
+}
 
 //int Dataset::show()
 //{

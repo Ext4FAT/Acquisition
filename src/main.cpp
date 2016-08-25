@@ -8,11 +8,12 @@ int main(int argc, char** argv)
 	////hog_svm.EndToEnd(".\\IDLER-DESKTOP-ITEMS\\");
 	
 	
+	//string save_dir_path = ".\\savedData\\";
+	//Dataset data(save_dir_path, 640, 480, 30);
+	//data.dataAcquire();
 	string save_dir_path = ".\\savedData\\";
 	Dataset data(save_dir_path, 640, 480, 30);
-	data.dataAcquire();
-
-
+	data.testSVM("C:\\Users\\IDLER\\Desktop\\DATASET\\DataSet");
 
 
 
