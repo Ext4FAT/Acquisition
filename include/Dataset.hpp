@@ -15,8 +15,8 @@ public:
 	inline string getSaveDirName(time_t slot);
 	
 	//
-	int Dataset::testSVM(string dir);
-	int Dataset::testRegion(string dir);
+	int testSVM(string dir);
+	int testRegion(string dir);
 	//
 	//demo with real-time capture video stream
 	int show();
