@@ -176,7 +176,7 @@ int HOG_SVM::BinaryClassification(string pos_path, string neg_path)
 	getDataSet(pospaths, 1);
 	getDataSet(negpaths, -1);
 	//training model
-	return training(trainMat_, labels_, true, ".\\IDLER-DESKTOP-ITEMS\\");
+	return training(trainMat_, labels_, true, ".\\");
 }
 
 
@@ -184,7 +184,10 @@ float HOG_SVM::EndToEnd(string data_path)
 {
 	//Trainset path
 	vector<string> subdirs = getSubdirName(data_path);
+	sort(subdirs.begin(), subdirs.end());
 	getCategory(subdirs);
+	for (auto sub: subdirs)
+		cout << sub << endl;
 	//Get trainset
 	for (auto &subdir : subdirs) {
 		vector<string> imgpaths = getCurdirFilePath(data_path + subdir + "\\");
@@ -192,6 +195,5 @@ float HOG_SVM::EndToEnd(string data_path)
 	}
 	//training model
 	training(trainMat_, labels_, true, data_path);
-
     return 1.0f;
 }

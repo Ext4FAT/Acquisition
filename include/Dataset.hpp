@@ -16,6 +16,7 @@ public:
 	
 	//
 	int Dataset::testSVM(string dir);
+	int Dataset::testRegion(string dir);
 	//
 	//demo with real-time capture video stream
 	int show();
